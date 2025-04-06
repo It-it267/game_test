@@ -1,42 +1,710 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Space Adventure</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+    <title>VidHub - Modern Video Sharing</title>
+    <style>
+        :root {
+            --primary: #ff0000;
+            --primary-dark: #cc0000;
+            --secondary: #282828;
+            --light: #f9f9f9;
+            --dark: #212121;
+            --gray: #606060;
+            --light-gray: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Header Styles */
+        header {
+            position: sticky;
+            top: 0;
+            background-color: white;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            margin-right: 0.5rem;
+            font-size: 2.2rem;
+        }
+
+        .search-bar {
+            display: flex;
+            flex-grow: 0.5;
+            margin: 0 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 20px 0 0 20px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-btn {
+            padding: 0 1.5rem;
+            background-color: var(--light-gray);
+            border: 1px solid var(--light-gray);
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover {
+            background-color: #d9d9d9;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            margin-left: 1rem;
+            cursor: pointer;
+            color: var(--secondary);
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            color: var(--primary);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-left: 1rem;
+            cursor: pointer;
+        }
+
+        /* Main Content Layout */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 56px);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 240px;
+            background-color: white;
+            padding: 1rem 0;
+            height: calc(100vh - 56px);
+            position: sticky;
+            top: 56px;
+            overflow-y: auto;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sidebar-item:hover {
+            background-color: var(--light-gray);
+        }
+
+        .sidebar-item.active {
+            background-color: #ff000010;
+            font-weight: 500;
+        }
+
+        .sidebar-item.active .sidebar-icon {
+            color: var(--primary);
+        }
+
+        .sidebar-icon {
+            margin-right: 1.5rem;
+            font-size: 1.3rem;
+            color: var(--secondary);
+        }
+
+        .sidebar-text {
+            font-size: 0.9rem;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background-color: var(--light-gray);
+            margin: 0.8rem 0;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 1.5rem;
+            background-color: var(--light);
+        }
+
+        .categories {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            gap: 0.8rem;
+        }
+
+        .category-btn {
+            padding: 0.5rem 0.8rem;
+            background-color: #00000010;
+            border: none;
+            border-radius: 8px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .category-btn:hover {
+            background-color: #00000020;
+        }
+
+        .category-btn.active {
+            background-color: var(--dark);
+            color: white;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .video-card {
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .thumbnail-container {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 0.8rem;
+        }
+
+        .thumbnail {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            display: block;
+        }
+
+        .duration {
+            position: absolute;
+            bottom: 0.5rem;
+            right: 0.5rem;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .video-info {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .channel-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--light-gray);
+        }
+
+        .video-details {
+            flex: 1;
+        }
+
+        .video-title {
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .channel-name {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.2rem;
+        }
+
+        .video-stats {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Unique Floating Video Player */
+        .floating-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateY(120%);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .floating-player.active {
+            transform: translateY(0);
+        }
+
+        .floating-player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .floating-player-title {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .floating-player-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .floating-player-video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background-color: var(--dark);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 72px;
+            }
+            .sidebar-text {
+                display: none;
+            }
+            .sidebar-item {
+                justify-content: center;
+                padding: 1rem 0;
+            }
+            .sidebar-icon {
+                margin-right: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-bar {
+                display: none;
+            }
+            .sidebar {
+                display: none;
+            }
+            .categories {
+                gap: 0.5rem;
+            }
+            .videos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        /* Animation for video loading */
+        @keyframes shimmer {
+            0% { background-position: -468px 0 }
+            100% { background-position: 468px 0 }
+        }
+
+        .shimmer {
+            background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
+            background-size: 800px 104px;
+            animation: shimmer 1.5s infinite linear;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
-    <div id="game-container">
-        <div id="ui">
-            <div id="score">Score: <span>0</span></div>
-            <div id="coins">Coins: <span>0</span></div>
-            <div id="health">Health: <span>100</span>%</div>
+    <header>
+        <div class="logo-container">
+            <a href="#" class="logo">
+                <span class="logo-icon"><i class="fas fa-play-circle"></i></span>
+                <span>VidHub</span>
+            </a>
         </div>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search">
+            <button class="search-btn"><i class="fas fa-search"></i></button>
+        </div>
+        
+        <div class="user-actions">
+            <button class="action-btn"><i class="fas fa-video"></i></button>
+            <button class="action-btn"><i class="fas fa-th"></i></button>
+            <button class="action-btn"><i class="fas fa-bell"></i></button>
+            <div class="user-avatar">U</div>
+        </div>
+    </header>
 
-        <div id="start-screen" class="overlay">
-            <h1>Space Adventure</h1>
-            <p>Collect coins and avoid enemies!</p>
-            <button id="start-btn">Start Game</button>
-        </div>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-item active">
+                <span class="sidebar-icon"><i class="fas fa-home"></i></span>
+                <span class="sidebar-text">Home</span>
+            </div>
+            <div class="sidebar-item">
+                <span class="sidebar-icon"><i class="fas fa-compass"></i></span>
+                <span class="sidebar-text">Explore</span>
+            </div>
+            <div class="sidebar-item">
+                <span class="sidebar-icon"><i class="fas fa-bookmark"></i></span>
+                <span class="sidebar-text">Subscriptions</span>
+            </div>
+            
+            <div class="sidebar-divider"></div>
+            
+            <div class="sidebar-item">
+                <span class="sidebar-icon"><i class="fas fa-photo-video"></i></span>
+                <span class="sidebar-text">Library</span>
+            </div>
+            <div class="sidebar-item">
+                <span class="sidebar-icon"><i class="fas fa-history"></i></span>
+                <span class="sidebar-text">History</span>
+            </div>
+            <div class="sidebar-item">
+                <span class="sidebar-icon"><i class="fas fa-clock"></i></span>
+                <span class="sidebar-text">Watch Later</span>
+            </div>
+            <div class="sidebar-item">
+                <span class="sidebar-icon"><i class="fas fa-thumbs-up"></i></span>
+                <span class="sidebar-text">Liked Videos</span>
+            </div>
+            
+            <div class="sidebar-divider"></div>
+            
+            <div class="sidebar-item">
+                <span class="sidebar-icon"><i class="fas fa-fire"></i></span>
+                <span class="sidebar-text">Trending</span>
+            </div>
+            <div class="sidebar-item">
+                <span class="sidebar-icon"><i class="fas fa-music"></i></span>
+                <span class="sidebar-text">Music</span>
+            </div>
+            <div class="sidebar-item">
+                <span class="sidebar-icon"><i class="fas fa-gamepad"></i></span>
+                <span class="sidebar-text">Gaming</span>
+            </div>
+            <div class="sidebar-item">
+                <span class="sidebar-icon"><i class="fas fa-newspaper"></i></span>
+                <span class="sidebar-text">News</span>
+            </div>
+        </aside>
 
-        <div id="game-over" class="overlay hidden">
-            <h1>Game Over</h1>
-            <p>Your score: <span id="final-score">0</span></p>
-            <p>Coins collected: <span id="final-coins">0</span></p>
-            <button id="restart-btn">Play Again</button>
-        </div>
+        <main class="main-content">
+            <div class="categories">
+                <button class="category-btn active">All</button>
+                <button class="category-btn">Music</button>
+                <button class="category-btn">Gaming</button>
+                <button class="category-btn">Live</button>
+                <button class="category-btn">Programming</button>
+                <button class="category-btn">Comedy</button>
+                <button class="category-btn">Podcasts</button>
+                <button class="category-btn">Recently uploaded</button>
+                <button class="category-btn">Watched</button>
+                <button class="category-btn">New to you</button>
+            </div>
+
+            <div class="videos-grid">
+                <!-- Video cards will be dynamically inserted here -->
+            </div>
+        </main>
     </div>
 
-    <script src="js/particles.js"></script>
-    <script src="js/enemies.js"></script>
-    <script src="js/animations.js"></script>
-    <script src="js/game.js"></script>
-    <script src="js/main.js"></script>
-</body>
+    <!-- Floating Video Player -->
+    <div class="floating-player" id="floatingPlayer">
+        <div class="floating-player-header">
+            <div class="floating-player-title">Now Playing</div>
+            <button class="floating-player-close" id="closeFloatingPlayer">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="floating-player-video" id="floatingPlayerVideo"></div>
+    </div>
 
+    <script>
+        // Video data
+        const videos = [
+            {
+                id: '1',
+                title: 'Building a Modern Web App with HTML, CSS & JavaScript',
+                channel: 'Web Dev Simplified',
+                views: '125K views',
+                time: '2 days ago',
+                duration: '12:34',
+                thumbnail: 'https://i.ytimg.com/vi/rsaGGbqVX30/hqdefault.jpg',
+                avatar: 'https://yt3.ggpht.com/ytc/AAUvwniF2kFX6gQZRV70C9eD8ZQZQ3X9zzE_KbQLXag=s68-c-k-c0x00ffffff-no-rj'
+            },
+            {
+                id: '2',
+                title: 'Learn CSS Grid in 20 Minutes',
+                channel: 'Traversy Media',
+                views: '1.2M views',
+                time: '1 year ago',
+                duration: '20:15',
+                thumbnail: 'https://i.ytimg.com/vi/jV8B24rSN5o/hqdefault.jpg',
+                avatar: 'https://yt3.ggpht.com/ytc/AAUvwnjOQiXUsXYMs8lwrd4litEEqXry1-atqJavJJ09=s68-c-k-c0x00ffffff-no-rj'
+            },
+            {
+                id: '3',
+                title: 'JavaScript Crash Course For Beginners',
+                channel: 'Programming with Mosh',
+                views: '3.7M views',
+                time: '3 years ago',
+                duration: '1:40:30',
+                thumbnail: 'https://i.ytimg.com/vi/W6NZfCO5SIk/hqdefault.jpg',
+                avatar: 'https://yt3.ggpht.com/ytc/AAUvwnkZ5KrL7t8dawC0dlK4RUDVdksLVY5bYvhQb8jJ=s68-c-k-c0x00ffffff-no-rj'
+            },
+            {
+                id: '4',
+                title: 'Build a Netflix Clone with React',
+                channel: 'Clever Programmer',
+                views: '856K views',
+                time: '8 months ago',
+                duration: '1:12:45',
+                thumbnail: 'https://i.ytimg.com/vi/P7t13SGytRk/hqdefault.jpg',
+                avatar: 'https://yt3.ggpht.com/ytc/AAUvwniFZplj7Z-1jABVUZJ9XJwQ9X9QZQ9X9QZQ9X9QZQ=s68-c-k-c0x00ffffff-no-rj'
+            },
+            {
+                id: '5',
+                title: 'Python Tutorial for Beginners - Full Course',
+                channel: 'freeCodeCamp.org',
+                views: '5.2M views',
+                time: '2 years ago',
+                duration: '4:26:52',
+                thumbnail: 'https://i.ytimg.com/vi/rfscVS0vtbw/hqdefault.jpg',
+                avatar: 'https://yt3.ggpht.com/ytc/AAUvwniFZplj7Z-1jABVUZJ9XJwQ9X9QZQ9X9QZQ9X9QZQ=s68-c-k-c0x00ffffff-no-rj'
+            },
+            {
+                id: '6',
+                title: 'UI Design Tutorial - Adobe XD Course',
+                channel: 'DesignCourse',
+                views: '1.8M views',
+                time: '1 year ago',
+                duration: '2:15:30',
+                thumbnail: 'https://i.ytimg.com/vi/68w2VwalD5w/hqdefault.jpg',
+                avatar: 'https://yt3.ggpht.com/ytc/AAUvwniFZplj7Z-1jABVUZJ9XJwQ9X9QZQ9X9QZQ9X9QZQ=s68-c-k-c0x00ffffff-no-rj'
+            },
+            {
+                id: '7',
+                title: 'How to Build a Startup - Full Course',
+                channel: 'Y Combinator',
+                views: '2.3M views',
+                time: '3 years ago',
+                duration: '3:45:12',
+                thumbnail: 'https://i.ytimg.com/vi/0CDXJ6bMkMY/hqdefault.jpg',
+                avatar: 'https://yt3.ggpht.com/ytc/AAUvwniFZplj7Z-1jABVUZJ9XJwQ9X9QZQ9X9QZQ9X9QZQ=s68-c-k-c0x00ffffff-no-rj'
+            },
+            {
+                id: '8',
+                title: 'Machine Learning for Beginners - Full Course',
+                channel: 'edureka!',
+                views: '1.5M views',
+                time: '1 year ago',
+                duration: '5:12:45',
+                thumbnail: 'https://i.ytimg.com/vi/Jh4eN6w2WqQ/hqdefault.jpg',
+                avatar: 'https://yt3.ggpht.com/ytc/AAUvwniFZplj7Z-1jABVUZJ9XJwQ9X9QZQ9X9QZQ9X9QZQ=s68-c-k-c0x00ffffff-no-rj'
+            }
+        ];
+
+        // Render videos
+        const videosGrid = document.querySelector('.videos-grid');
+        
+        function renderVideos() {
+            videosGrid.innerHTML = '';
+            
+            videos.forEach(video => {
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                videoCard.innerHTML = `
+                    <div class="thumbnail-container">
+                        <img src="${video.thumbnail}" alt="${video.title}" class="thumbnail">
+                        <span class="duration">${video.duration}</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="channel-avatar" style="background-image: url('${video.avatar}')"></div>
+                        <div class="video-details">
+                            <h3 class="video-title">${video.title}</h3>
+                            <p class="channel-name">${video.channel}</p>
+                            <p class="video-stats">${video.views} • ${video.time}</p>
+                        </div>
+                    </div>
+                `;
+                
+                videoCard.addEventListener('click', () => playVideo(video));
+                videosGrid.appendChild(videoCard);
+            });
+        }
+
+        // Unique feature: Floating video player
+        const floatingPlayer = document.getElementById('floatingPlayer');
+        const floatingPlayerVideo = document.getElementById('floatingPlayerVideo');
+        const closeFloatingPlayer = document.getElementById('closeFloatingPlayer');
+        
+        function playVideo(video) {
+            // Show floating player
+            floatingPlayer.classList.add('active');
+            
+            // Create video iframe
+            floatingPlayerVideo.innerHTML = `
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            `;
+            
+            // Scroll to top if mobile
+            if (window.innerWidth < 768) {
+                window.scrollTo(0, 0);
+            }
+        }
+        
+        closeFloatingPlayer.addEventListener('click', () => {
+            floatingPlayer.classList.remove('active');
+            floatingPlayerVideo.innerHTML = '';
+        });
+
+        // Category buttons functionality
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Simulate loading
+                videosGrid.innerHTML = '';
+                for (let i = 0; i < 8; i++) {
+                    const skeleton = document.createElement('div');
+                    skeleton.className = 'video-card';
+                    skeleton.innerHTML = `
+                        <div class="thumbnail-container shimmer" style="height: 0; padding-bottom: 56.25%;"></div>
+                        <div class="video-info">
+                            <div class="channel-avatar shimmer"></div>
+                            <div class="video-details">
+                                <div class="video-title shimmer" style="height: 20px; width: 100%; margin-bottom: 8px;"></div>
+                                <div class="channel-name shimmer" style="height: 16px; width: 70%; margin-bottom: 4px;"></div>
+                                <div class="video-stats shimmer" style="height: 16px; width: 60%;"></div>
+                            </div>
+                        </div>
+                    `;
+                    videosGrid.appendChild(skeleton);
+                }
+                
+                // Load new content after delay
+                setTimeout(renderVideos, 1000);
+            });
+        });
+
+        // Initialize
+        renderVideos();
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        const searchBtn = document.querySelector('.search-btn');
+        
+        searchBtn.addEventListener('click', () => {
+            if (searchInput.value.trim()) {
+                alert(`Searching for: ${searchInput.value}`);
+                // In a real app, you would filter videos here
+            }
+        });
+        
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && searchInput.value.trim()) {
+                alert(`Searching for: ${searchInput.value}`);
+            }
+        });
+
+        // Unique feature: Drag floating player
+        let isDragging = false;
+        let offsetX, offsetY;
+        
+        floatingPlayerHeader.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offsetX = e.clientX - floatingPlayer.getBoundingClientRect().left;
+            offsetY = e.clientY - floatingPlayer.getBoundingClientRect().top;
+            floatingPlayer.style.cursor = 'grabbing';
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            floatingPlayer.style.left = `${e.clientX - offsetX}px`;
+            floatingPlayer.style.top = `${e.clientY - offsetY}px`;
+        });
+        
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            floatingPlayer.style.cursor = 'grab';
+        });
+    </script>
+</body>
 </html>
